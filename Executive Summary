@@ -1,0 +1,39 @@
+# Project 3 - Subreddit Classification
+### Matthew DeVay, ATX-DSI-11
+
+## Problem:
+
+Select two subreddits and from a post from either, identify which subreddit from which it originated. Evaluate at least two models, one of which must be a Naive Bayes. 
+
+## Exectutive Summary:
+
+After speaking with people in the general domain of Data Science, a common theme is that none of them actually consider themselves data scientists, despite almost exclusively using tools and models with which data scientists should be proficient. As such, I was curious as to whether or not the Learn Machine Learning subreddit was significantly distinguishable from the Data Science Subreddit. Anectdotally, both are casual, with representation from both newcomers and experts. There is no specified format for posting, and the subreddit rules are fairly similar. 
+
+Data was obtained via the pushshift API, with posts tagged as removed by moderators and/or users rejected. Crossposts were set to 0 to reject submissions that may have been crossposted on both subs. Video posts were similarly rejected. Only submissions were analyzed. 
+
+The submission title data were CountVectorized and fed into a Multinomial Naive Bayes (MNB) model. Grid search was performed over several hyperparameters. The grid search yielded a model with approximately 78% accuracy score for predicting which subreddit a post may have come from based on its title. Predictions for the validation data had an accuracy score of approximately 77%, indicating reasonable bias and variance for this model.
+
+Further modeling was done using TF-IDF Vectorization, and used to train a support vector model. Grid search was also performed over several hyperparameters, and yielded a model with approximately 78% accuracy as well. Predictions for the validation data had an accuracy of approximately 76%, also indicating reasonable bias and variance, but failing to outperform the MNB model.
+
+As an extra step, the gridsearch model for the MNB was trained on the selftext data. Prior to this, the selftext data had been munged to remove empty or nan observations. This leads to a roughly 20% reduction in total data, and makes predictibility dependent on the presence of selftext data. It also massively increases the features after vectorization, which leads to significantly longer modeling times. 
+
+The accuracy score of the selftext training data for the best performing MNB model was approximately 81%. The accuracy for the validation data was approximately 82%. A 3% gain in accuracy was realized at the cost of approximately a 5x increase in CPU utilization. Combined with the lowered number of suitable submissions, predicting based on selftext probably does not provide any benefit for real-world application of the model.
+
+### Data import and EDA:
+
+Dataframes were created from JSON via the Pushshift.io API. These were then concatenated to form the overall dataset. 3000 of the most recent submissions, filtered to exclude crossposting, mod/user removal, and video content were used to construct the dataframe. 
+
+The most common words from each dataset were plotted by count. The intersection of these sets were also plotted as paired barplots. Seaborn was primarily used for visualization.
+
+### Modeling
+
+Pipelines were built using Count Vectorizers and TFIDF Vectorizers for Multinomial Niave Bayes and Gaussian Naive Bayes models, respectively. Hyperparameters were optimized via gridsearch, and included regularization, ngrams, stopwords, min_df, max_df, and max_features.
+
+### Analysis
+
+A confusion matrix of the MNB model was generated. The model was more likely to identify a machine learning post as data science than vice versa. Precision, Specificity, and Sensitivity were calculated.
+
+
+## Conclusion
+
+In summation, it is sufficiently challenging to predict accurately whether or not a post originated in a group focused on Data Science or Machine Learning. Based on these models, my friend should acknowledge that machine learning and data science are inextricably intertwined. Further areas of study have been identified if my friend requires more convincing.
